@@ -73,6 +73,7 @@ public class DefaultTemplateWatermarkService implements TemplateWatermarkService
 
   private PdfReader createReader(WatermarkItem watermark) throws IOException {
     final PdfReader reader = new PdfReader(watermark.getInputFile().getAbsolutePath());
+    // TODO owner password
     return reader;
   }
 }

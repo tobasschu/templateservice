@@ -60,7 +60,8 @@ public class TemplatePDFServiceTest {
     assertTrue(!f.isDirectory());
     assertTrue(f.length() > 0);
 
-    f.delete();
+    // TODO wieder rein
+    // f.delete();
 
   }
 }

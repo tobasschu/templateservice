@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import org.apache.poi.xwpf.converter.pdf.PdfOptions;
+
 import de.tschumacher.templateservice.domain.TemplateItem;
 import de.tschumacher.templateservice.exception.TemplateServiceException;
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
@@ -44,11 +46,29 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
     try {
       final IXDocReport report = loadReport(item.getInputFile());
       final IContext context = loadContext(report, item.getContext());
-      final Options options = Options.getTo(ConverterTypeTo.PDF);
+      final Options options = Options.getTo(ConverterTypeTo.PDF).subOptions(createPDFOptions(item));
       createItem(item, report, context, options);
     } catch (IOException | XDocReportException e) {
       throw new TemplateServiceException(e);
     }
+  }
+
+
+
+  private Object createPDFOptions(TemplateItem item) {
+    final PdfOptions options = PdfOptions.create();
+    // TODO
+    // if (item.getEncryption() != null) {
+    // options.setConfiguration(new IPdfWriterConfiguration() {
+    //
+    // @Override
+    // public void configure(PdfWriter writer) {
+    // writer.setEncryption(item.getEncryption().getUserPassword(), item.getEncryption()
+    // .getOwnerPassword(), permissions, encryptionType);
+    // }
+    // });
+    // }
+    return options;
   }
 
 
@@ -71,7 +91,7 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
   }
 
   private IXDocReport loadReport(File file) throws FileNotFoundException, IOException,
-  XDocReportException {
+      XDocReportException {
     final InputStream in = new FileInputStream(file);
     final IXDocReport report =
         XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Velocity);
