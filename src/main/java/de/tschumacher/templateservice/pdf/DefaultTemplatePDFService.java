@@ -24,6 +24,9 @@ import java.util.Map;
 
 import org.apache.poi.xwpf.converter.pdf.PdfOptions;
 
+import com.lowagie.text.pdf.PdfStream;
+import com.lowagie.text.pdf.PdfWriter;
+
 import de.tschumacher.templateservice.domain.TemplateItem;
 import de.tschumacher.templateservice.exception.TemplateServiceException;
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
@@ -32,6 +35,7 @@ import fr.opensagres.xdocreport.converter.XDocConverterException;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
+import fr.opensagres.xdocreport.itext.extension.IPdfWriterConfiguration;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 
@@ -46,7 +50,9 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
     try {
       final IXDocReport report = loadReport(item.getInputFile());
       final IContext context = loadContext(report, item.getContext());
-      final Options options = Options.getTo(ConverterTypeTo.PDF).subOptions(createPDFOptions(item));
+      final Options options = Options.getTo(ConverterTypeTo.PDF)
+          // .via(ConverterTypeVia.OpenXMLFormats)
+          .subOptions(createPDFOptions(item));
       createItem(item, report, context, options);
     } catch (IOException | XDocReportException e) {
       throw new TemplateServiceException(e);
@@ -55,22 +61,26 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
 
 
 
-  private Object createPDFOptions(TemplateItem item) {
+  private Object createPDFOptions(final TemplateItem item) {
     final PdfOptions options = PdfOptions.create();
-    // TODO
-    // if (item.getEncryption() != null) {
-    // options.setConfiguration(new IPdfWriterConfiguration() {
-    //
-    // @Override
-    // public void configure(PdfWriter writer) {
-    // writer.setEncryption(item.getEncryption().getUserPassword(), item.getEncryption()
-    // .getOwnerPassword(), permissions, encryptionType);
-    // }
-    // });
-    // }
+
+    options.setConfiguration(new IPdfWriterConfiguration() {
+      @Override
+      public void configure(PdfWriter writer) {
+        if (item.shouldCompress()) {
+          writer.setCompressionLevel(PdfStream.BEST_COMPRESSION);
+        }
+        // TODO encryption
+        // if (item.getEncryption() != null) {
+        // writer.setEncryption(item.getEncryption().getUserPassword(), item.getEncryption()
+        // .getOwnerPassword(), permissions, encryptionType);
+        // }
+        // });
+        // }
+      }
+    });
     return options;
   }
-
 
 
   private void createItem(TemplateItem item, final IXDocReport report, final IContext context,
@@ -91,7 +101,7 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
   }
 
   private IXDocReport loadReport(File file) throws FileNotFoundException, IOException,
-      XDocReportException {
+  XDocReportException {
     final InputStream in = new FileInputStream(file);
     final IXDocReport report =
         XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Velocity);

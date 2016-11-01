@@ -1,11 +1,11 @@
 /*
  * Copyright 2015 Tobias Schumacher
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -20,6 +20,7 @@ public class TemplateItem {
   private final File inputFile;
   private final File outputFile;
   private final Map<String, Object> context;
+  private final boolean compress;
 
   public File getInputFile() {
     return this.inputFile;
@@ -37,10 +38,16 @@ public class TemplateItem {
     return new Builder();
   }
 
+
+  public boolean shouldCompress() {
+    return this.compress;
+  }
+
   private TemplateItem(Builder builder) {
     this.inputFile = builder.inputFile;
     this.outputFile = builder.outputFile;
     this.context = builder.context;
+    this.compress = builder.compress;
   }
 
   public static class Builder {
@@ -48,6 +55,7 @@ public class TemplateItem {
     private File inputFile;
     private File outputFile;
     private Map<String, Object> context;
+    private boolean compress;
 
     public Builder withInputFile(File inputFile) {
       this.inputFile = inputFile;
@@ -64,10 +72,16 @@ public class TemplateItem {
       return this;
     }
 
+    public Builder withCompress(boolean compress) {
+      this.compress = compress;
+      return this;
+    }
+
     public TemplateItem build() {
       return new TemplateItem(this);
     }
   }
+
 
 
 }
