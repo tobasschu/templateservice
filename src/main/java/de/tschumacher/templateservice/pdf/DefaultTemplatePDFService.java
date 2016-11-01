@@ -69,6 +69,7 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
       public void configure(PdfWriter writer) {
         if (item.shouldCompress()) {
           writer.setCompressionLevel(PdfStream.BEST_COMPRESSION);
+          writer.setFullCompression();
         }
         // TODO encryption
         // if (item.getEncryption() != null) {
