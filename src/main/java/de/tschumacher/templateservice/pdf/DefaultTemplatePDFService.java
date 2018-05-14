@@ -106,6 +106,7 @@ public class DefaultTemplatePDFService implements TemplatePDFService {
     final InputStream in = new FileInputStream(file);
     final IXDocReport report =
         XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Velocity);
+    in.close();
     return report;
   }
 
